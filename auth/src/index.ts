@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
+import mongoose from 'mongoose';
 
 import { currentUserRouter } from './routes/current-user.routes';
 import { signInRouter } from './routes/sign-in.routes';
@@ -24,6 +25,22 @@ app.all('*', async () => {
 
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log('🚀 Listerning on port 3000!');
-});
+const start = async () => {
+  try {
+    await mongoose.connect('mongodb://auth-mongo-srv:27017/auth', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
+
+    console.log('👍 db connected!')
+  } catch (err) {
+    console.error(err);
+  }
+
+  app.listen(3000, () => {
+    console.log('🚀 listerning on port 3000!');
+  });
+};
+
+start();
