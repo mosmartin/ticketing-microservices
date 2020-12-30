@@ -1,6 +1,6 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
-import { Password } from '../utils/password';
+import { Password } from '../utils/PasswordManager';
 
 // an interface that describes the properties required to create a new user
 interface User {
