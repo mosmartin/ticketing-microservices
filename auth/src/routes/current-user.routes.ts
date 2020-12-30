@@ -1,11 +1,9 @@
 import express from 'express';
 
+import { getCurrentUser } from '../controllers/currentUser.controller';
+
 const router = express.Router();
 
-router.get('/api/v1/users/me', (req, res) => {
-  res.status(200).json({
-    message: 'Current User',
-  });
-});
+router.get('/api/v1/users/me', getCurrentUser);
 
 export { router as currentUserRouter };
