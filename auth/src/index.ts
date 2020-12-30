@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import mongoose from 'mongoose';
+import cookieSession from 'cookie-session';
 
 import { currentUserRouter } from './routes/current-user.routes';
 import { signInRouter } from './routes/sign-in.routes';
@@ -12,7 +13,15 @@ import { NotFoundError } from './errors/not-found-error';
 
 const app = express();
 
+app.set('trust proxy', true);
+
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false,
+    secure: true,
+  })
+);
 
 app.use(currentUserRouter);
 app.use(signInRouter);
@@ -26,6 +35,10 @@ app.all('*', async () => {
 app.use(errorHandler);
 
 const start = async () => {
+  if (!process.env.JWT_SECRET_KEY) {
+    throw new Error('JWT_SECRET_KEY must be defined');
+  }
+
   try {
     await mongoose.connect('mongodb://auth-mongo-srv:27017/auth', {
       useNewUrlParser: true,
@@ -33,7 +46,7 @@ const start = async () => {
       useCreateIndex: true,
     });
 
-    console.log('👍 db connected!')
+    console.log('👍 db connected!');
   } catch (err) {
     console.error(err);
   }

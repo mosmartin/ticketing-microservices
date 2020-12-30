@@ -1,5 +1,7 @@
 import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+
 import { BadRequestError } from '../errors/bad-request-error';
 import { RequestValidationError } from '../errors/request-validation-errors';
 import { User } from '../models/User';
@@ -22,6 +24,20 @@ export const signUp: RequestHandler = async (req, res) => {
 
   const user = User.build({ email, password });
   await user.save();
+
+  // generate jwt
+  const userJwt = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET_KEY!
+  );
+
+  // store the jwt in a session obj
+  req.session = {
+    jwt: userJwt,
+  };
 
   res.status(201).json(user);
 };
